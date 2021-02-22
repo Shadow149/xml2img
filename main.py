@@ -1,16 +1,12 @@
-from img_xml.XMLImage import XMLImage
-from img_xml.Constants import Constants
-
-class TestObj:
-    def __init__(self, data):
-        self.data = data
+from xml2img.XMLImage import XMLImage
+from xml2img.Constants import Constants
 
 class TestImg (XMLImage):
     def __init__(self, width, height, xml_path, css_path, background_colour, constants):
         super().__init__(width, height, xml_path, css_path, background_colour, constants)
 
     def initialise_variables(self):
-        self.set_variable("test_iterable",[[1,"kormit.png"],[2,"aghs_shard.png"],[1,"kormit.png"]])
+        self.set_variable("test_iterable",[[1,"kormit.png"],[2,"kormit.png"],[1,"kormit.png"]])
         pass
 
 if __name__ == "__main__":
