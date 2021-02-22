@@ -1,0 +1,17 @@
+<root>
+    <Section>
+        <Title text="kormit"/>
+        <Label text="help him"/>
+        <Section id="inline_section">
+            <Image id="test_img" src="kormit.png"/>
+            <Image id="test_img" src="kormit.png"/>
+            <Image id="test_img" src="kormit.png"/>
+            <Image id="test_img" src="kormit.png"/>
+        </Section>
+
+        <RepeatedSection iterable="{self.test_iterable}" element="item">
+            <Title text="{self.item}"/>
+        </RepeatedSection>
+
+    </Section>
+</root>
