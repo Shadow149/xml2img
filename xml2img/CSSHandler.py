@@ -4,14 +4,11 @@ from .Element import Element
 import cssselect2
 import tinycss2
 
-import time
-
 class CSSHandler:
     def __init__(self, path):
         self.css = open(path,'r').read()
 
     def get_css(self):
-        start = time.time()
         stylesheet = tinycss2.parse_stylesheet(self.css , skip_whitespace = True)
         rules = {}
         prev = None
@@ -59,6 +56,5 @@ class CSSHandler:
 
 
             rules[selector_string[0].value] = s_rules
-        print(f"CSSHandler: {time.time() - start}s")
         return rules
 
