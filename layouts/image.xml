@@ -2,16 +2,23 @@
     <Section>
         <Title text="kormit"/>
         <Label text="help him"/>
-        <Section id="inline_section">
-            <Image id="test_img" src="kormit.png"/>
-            <Image id="test_img" src="kormit.png"/>
-            <Image id="test_img" src="kormit.png"/>
-            <Image id="test_img" src="kormit.png"/>
-        </Section>
+        
 
         <RepeatedSection iterable="{self.test_iterable}" element="item">
-            <Title text="{self.item}"/>
+            <Section id="inline_section">
+                <Section>
+                    <Title text="{self.item[0]}"/>
+                    <Image id="test_img" src="{self.item[1]}"/>
+                </Section>
+                <Title text="asdasd"/>
+            </Section>
         </RepeatedSection>
+        <Title text="kormit"/>
+        <Label text="help him"/>
+        
+        <!-- <Section id="elp" iterable="{self.test_iterable}" element="item">
+            <Title text="{self.item}"/>
+        </Section> -->
 
     </Section>
 </root>

@@ -1,7 +1,7 @@
+from typing import Iterable
 from parsel import Selector
 from .Element import Element
 from .ImageElement import ImageElement
-import time
 
 class XMLHandler:
     def __init__(self, path, constants):
@@ -24,8 +24,16 @@ class XMLHandler:
                     self.xml_list.append(ie)
             else: 
                 css_id = node.xpath("@id").getall()
-                n = Element("Section",None,css_id,[],parent_element)
+                iterable = node.xpath("@iterable").getall()
+                element_name = node.xpath("@element").getall()
+                
+                if len(iterable) > 0:
+                    n = Element("Section",None,css_id,[],parent_element,iterable,element_name,"RepeatedSection")
+                else:
+                    n = Element("Section",None,css_id,[],parent_element,iterable,element_name)
+                    
                 ie = ImageElement(n, self.constants)
+                
                 self._get_nodes(node.xpath("child::*"),ie)
                 if parent_element != None:
                     parent_element.element.children.append(ie)
@@ -33,9 +41,7 @@ class XMLHandler:
                     self.xml_list.append(ie)
 
     def get_xml_elements(self):
-        start = time.time()
         selector = Selector(text=self.xml)
         nodes = selector.xpath("//root/*")
         self._get_nodes(nodes, None)
-        print(f"XMLHandler: {time.time() - start}s")
         return self.xml_list
