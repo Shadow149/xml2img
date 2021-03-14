@@ -28,7 +28,7 @@ class XMLHandler:
                 element_name = node.xpath("@element").getall()
                 
                 if len(iterable) > 0:
-                    n = Element("Section",None,css_id,[],parent_element,iterable,element_name,"RepeatedSection")
+                    n = Element("RepeatedSection",None,css_id,[],parent_element,iterable,element_name)
                 else:
                     n = Element("Section",None,css_id,[],parent_element,iterable,element_name)
                     
@@ -44,4 +44,5 @@ class XMLHandler:
         selector = Selector(text=self.xml)
         nodes = selector.xpath("//root/*")
         self._get_nodes(nodes, None)
+        print(self.xml_list)
         return self.xml_list

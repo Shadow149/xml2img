@@ -2,11 +2,12 @@ from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from .XMLHandler import XMLHandler
 from .CSSHandler import CSSHandler
 import ast
-
+import random
 import copy
 
 class XMLImage:
-    def __init__(self, width, height, xml_path, css_path, background_colour, constants):
+    def __init__(self, width, height, xml_path, css_path, background_colour, constants, debug = False):
+        self.debug = debug
         self.width = width
         self.height = height
 
@@ -25,10 +26,9 @@ class XMLImage:
             self.__setattr__(attr, value)
 
     def process_css(self, imageElement, rules):
-        for id_ in imageElement.element.id:#
+        for id_ in imageElement.element.data.id:
             if id_ not in rules:
                 continue
-
             idents = rules[id_]
             for ident in idents:
                 value = idents[ident]
@@ -80,7 +80,7 @@ class XMLImage:
         for i in range(len(elements)):
             if len(elements[i].element.children) == 0:
                 self.__setattr__(element_name,iterable[count])
-                elements[i].data = self.eval_string(elements[i].element.data[0])
+                elements[i].data = self.eval_string(elements[i].element.data.data[0])
                 elements[i].copied = True
                     
             self.init_repeated(elements[i].element.children, element_name, iterable,count)
@@ -89,13 +89,13 @@ class XMLImage:
     def init_elements(self, elements, rules):
         for i in range(len(elements)):
             elements[i] = self.process_css(elements[i],rules)
-            if elements[i].element.data != None:
-                if len(elements[i].element.data) > 0 and not elements[i].copied:
-                    elements[i].data = self.eval_string(elements[i].element.data[0])
-                    
-            if elements[i].element.sectionType == "RepeatedSection":
-                elements[i].iterable = ast.literal_eval(self.eval_string(elements[i].element.iterable[0]))
-                elements[i].element_name = self.eval_string(elements[i].element.element_name[0])
+            if elements[i].element.data.data != None:
+                if len(elements[i].element.data.data) > 0 and not elements[i].copied:
+                    elements[i].data = self.eval_string(elements[i].element.data.data[0])
+
+            if elements[i].element.element == "RepeatedSection":
+                elements[i].iterable = ast.literal_eval(self.eval_string(elements[i].element.data.iterable[0]))
+                elements[i].element_name = self.eval_string(elements[i].element.data.element_name[0])
                 self.set_variable(elements[i].element_name,elements[i].iterable[0])
                 
                 ne = []
@@ -117,16 +117,23 @@ class XMLImage:
 
         for imageElement in elements:  
                                                 
+            imageElement.init_pos(self.draw, self.debug)
+            
             if imageElement.element.element == "Section":
         
-                imageElement.init_pos(self.draw)
                 self.process(imageElement.element.children, rules)  
                 
             if imageElement.element.parent == None:
                 pass
             
+
             if imageElement.element.element != "Section":
-                        
+                if self.debug:
+                    if imageElement.element.element != "block":
+                        self.draw.rectangle((imageElement.x_off,imageElement.y_off, imageElement.x_off + imageElement.width, imageElement.y_off + imageElement.height), outline=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+                    elif imageElement.img_height != None or imageElement.img_width != None:
+                        self.draw.rectangle((imageElement.x_off,imageElement.y_off, imageElement.x_off + imageElement.img_width, imageElement.y_off + imageElement.img_height), outline=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+                    
                 if imageElement.element.element == "title":
                     text = imageElement.data
                     font = ImageFont.truetype(imageElement.font_family, int(imageElement.font_size))
@@ -156,6 +163,8 @@ class XMLImage:
                 
 
     def resize_image(self, img, new_h, new_w):
+        if img == None:
+            return img
         width, height = img.size
 
         new_h = int(new_w * height / width )

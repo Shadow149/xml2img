@@ -2,6 +2,7 @@ import requests
 import ast
 import io
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
+import random
 
 class ImageElement:
     def __init__(self, element, constants):
@@ -43,16 +44,16 @@ class ImageElement:
         self.copied = False
         
     
-    def init_size(self, draw):
-        size = self.get_size(draw)
+    def init_size(self, draw, debug):
+        size = self.get_size(draw, debug)
         if not self.background:
-            self.width = size[0] + self.left_margin - self.right_margin
-            self.height = size[1] + self.top_margin - self.bottom_margin
+            self.width = size[0]  
+            self.height = size[1] 
         else:
             self.width, self.height = 0, 0
         return self.width, self.height
 
-    def get_size(self, draw):
+    def get_size(self, draw, debug):
         if not (self.width == 0 and self.height == 0):
             return self.width, self.height
 
@@ -60,7 +61,7 @@ class ImageElement:
             widths, heights = [], []
             width, height = 0, 0
             for i in range(len(self.element.children)):
-                w, h = self.element.children[i].init_size(draw)
+                w, h = self.element.children[i].init_size(draw, debug)
                 widths.append(w)
                 heights.append(h)
 
@@ -74,6 +75,8 @@ class ImageElement:
             return width, height
 
         if self.element.element == "title":
+            if self.img_height != None or self.img_width != None:
+                return self.img_width, self.img_height
             text = self.data
 
             if self.font_size == self.constants.DEFAULT_FONT_SIZE:
@@ -86,6 +89,8 @@ class ImageElement:
             return text_size[0] + 10, self.font_size + 10
 
         if self.element.element == "label":
+            if self.img_height != None or self.img_width != None:
+                return self.img_width, self.img_height
             text = self.data
                 
             font = ImageFont.truetype(self.font_family, int(self.font_size))
@@ -99,12 +104,15 @@ class ImageElement:
                 img = None
                 return 0,0
             elif path[:4] == "http":
-                img = Image.open(requests.get(path, stream=True).raw)
+                try:
+                    img = Image.open(requests.get(path, stream=True).raw)
+                except:
+                    return 0,0
             elif path[0] == 'b':
                 img = Image.open(io.BytesIO(eval(path)))
             else:
                 img = Image.open(path)
-
+            
             self.pil_data = img
             image_size = img.size
             
@@ -128,23 +136,32 @@ class ImageElement:
                 self.iterable = self.element.parent.iterable
                 self.element_name = self.element.parent.element_name
             
-    def init_pos(self, draw):
-        self.x = self.x_off + self.left_margin - self.right_margin
-        self.y = self.y_off + self.top_margin - self.bottom_margin
+    def init_pos(self, draw, debug):
+        print(self.left_margin)
+        
+        self.x_off += self.left_margin - self.right_margin 
+        self.y_off += self.top_margin - self.bottom_margin
+        
+        self.x = self.x_off
+        self.y = self.y_off
+        
+        
         for i in range(len(self.element.children)):    
             self.element.children[i].init_vars()
-            self.element.children[i].init_size(draw)
+            self.element.children[i].init_size(draw, debug)
 
+            
             if not self.element.children[i].inline:
                 self.element.children[i].y_off = self.y
                 self.y += self.element.children[i].height 
-                self.y_off = self.y
             else:
                 self.element.children[i].x_off = self.x
                 self.x += self.element.children[i].width
-                self.x_off = self.x
             
-            self.element.children[i].x_off += self.element.children[i].left_margin - self.element.children[i].right_margin
-            self.element.children[i].y_off += self.element.children[i].top_margin - self.element.children[i].bottom_margin
+            # self.x += self.element.children[i].left_margin - self.element.children[i].right_margin 
+            # self.y += self.element.children[i].top_margin - self.element.children[i].bottom_margin
+            # self.element.children[i].x_off += self.left_margin - self.right_margin 
+            # self.element.children[i].y_off += self.top_margin - self.bottom_margin
+            
         
         
