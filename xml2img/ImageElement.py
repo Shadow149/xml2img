@@ -11,8 +11,8 @@ class ImageElement:
         self.element = element
         self.inline = False
         self.o_inline = False
-        self.x_off = self.constants.DEFAULT_MARGIN
-        self.y_off = self.constants.DEFAULT_MARGIN
+        self.x_off = self.constants.default_margin
+        self.y_off = self.constants.default_margin
 
         self.left_margin = 0
         self.right_margin = 0
@@ -27,10 +27,10 @@ class ImageElement:
 
         self.background = False
 
-        self.font_size = self.constants.DEFAULT_FONT_SIZE
-        self.font_family = self.constants.DEFAULT_FONT_FAMILY
+        self.font_size = self.constants.default_font_size
+        self.font_family = self.constants.default_font_family
 
-        self.color = self.constants.DEFAULT_COLOUR
+        self.color = self.constants.default_colour
         self.opacity = 1
         
         self.counter = 1
@@ -46,11 +46,14 @@ class ImageElement:
     
     def init_size(self, draw, debug):
         size = self.get_size(draw, debug)
+        print(self.element.element,self.element.data.id,size[1], self.width, self.height)
         if not self.background:
-            self.width = size[0]  
-            self.height = size[1] 
+            if (self.width == 0 and self.height == 0):
+                self.width = size[0] + (self.left_margin - self.right_margin)
+                self.height = size[1] + (self.top_margin - self.bottom_margin)
         else:
             self.width, self.height = 0, 0
+        print('first',self.element.element,self.height )
         return self.width, self.height
 
     def get_size(self, draw, debug):
@@ -71,7 +74,7 @@ class ImageElement:
                 else:
                     width = max(widths)
                     height += h
-
+            print('asdasd',height)
             return width, height
 
         if self.element.element == "title":
@@ -79,12 +82,12 @@ class ImageElement:
                 return self.img_width, self.img_height
             text = self.data
 
-            if self.font_size == self.constants.DEFAULT_FONT_SIZE:
-                self.font_size = self.constants.HEADER_FONT_SIZE
+            if self.font_size == self.constants.default_font_size:
+                self.font_size = self.constants.header_font_size
 
-            self.font_family = self.constants.HEADER_FONT_FAMILY
+            self.font_family = self.constants.header_font_family
             
-            font = ImageFont.truetype(self.constants.HEADER_FONT_FAMILY, int(self.font_size))
+            font = ImageFont.truetype(self.constants.header_font_family, int(self.font_size))
             text_size = draw.textsize(text, font)
             return text_size[0] + 10, self.font_size + 10
 
@@ -95,7 +98,7 @@ class ImageElement:
                 
             font = ImageFont.truetype(self.font_family, int(self.font_size))
             text_size = draw.textsize(text, font)
-            return text_size[0] + 10, self.font_size + 10
+            return text_size[0] + 5, self.font_size 
 
         elif self.element.element == "image":
                 
@@ -137,7 +140,6 @@ class ImageElement:
                 self.element_name = self.element.parent.element_name
             
     def init_pos(self, draw, debug):
-        print(self.left_margin)
         
         self.x_off += self.left_margin - self.right_margin 
         self.y_off += self.top_margin - self.bottom_margin
@@ -147,6 +149,7 @@ class ImageElement:
         
         
         for i in range(len(self.element.children)):    
+            print('blyat',self.element.element, self.element.data.id)
             self.element.children[i].init_vars()
             self.element.children[i].init_size(draw, debug)
 
@@ -157,9 +160,14 @@ class ImageElement:
             else:
                 self.element.children[i].x_off = self.x
                 self.x += self.element.children[i].width
-            
+            # self.element.children[i].init_pos(draw, debug)
+        print('---------')    
             # self.x += self.element.children[i].left_margin - self.element.children[i].right_margin 
             # self.y += self.element.children[i].top_margin - self.element.children[i].bottom_margin
+        
+        # if self.element.element == "Section":
+        #     self.width += self.x
+        #     self.height += self.y
             # self.element.children[i].x_off += self.left_margin - self.right_margin 
             # self.element.children[i].y_off += self.top_margin - self.bottom_margin
             

@@ -44,5 +44,4 @@ class XMLHandler:
         selector = Selector(text=self.xml)
         nodes = selector.xpath("//root/*")
         self._get_nodes(nodes, None)
-        print(self.xml_list)
         return self.xml_list

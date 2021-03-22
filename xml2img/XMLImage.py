@@ -115,7 +115,8 @@ class XMLImage:
 
     def process(self, elements, rules):
 
-        for imageElement in elements:  
+        for i, imageElement in enumerate(elements):  
+            print(i, imageElement.element.element, imageElement.element.data.id)
                                                 
             imageElement.init_pos(self.draw, self.debug)
             
@@ -127,12 +128,19 @@ class XMLImage:
                 pass
             
 
+            if self.debug:
+                font = ImageFont.truetype(imageElement.font_family, 10)
+                self.draw.rectangle((imageElement.x_off - (imageElement.left_margin - imageElement.right_margin),
+                                     imageElement.y_off - (imageElement.top_margin - imageElement.bottom_margin), 
+                                     imageElement.x_off + imageElement.width - (imageElement.left_margin - imageElement.right_margin), 
+                                     imageElement.y_off + imageElement.height - (imageElement.top_margin - imageElement.bottom_margin)), 
+                                    outline=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+                self.draw.text((imageElement.x_off - (imageElement.left_margin - imageElement.right_margin),
+                                     imageElement.y_off - (imageElement.top_margin - imageElement.bottom_margin) - 10), f'{imageElement.element.element} {str(i)} {imageElement.element.data.id}', font=font, fill=(255,0,0))
             if imageElement.element.element != "Section":
-                if self.debug:
-                    if imageElement.element.element != "block":
-                        self.draw.rectangle((imageElement.x_off,imageElement.y_off, imageElement.x_off + imageElement.width, imageElement.y_off + imageElement.height), outline=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
-                    elif imageElement.img_height != None or imageElement.img_width != None:
-                        self.draw.rectangle((imageElement.x_off,imageElement.y_off, imageElement.x_off + imageElement.img_width, imageElement.y_off + imageElement.img_height), outline=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
+                    #if imageElement.element.element != "block":
+                    # elif imageElement.img_height != None or imageElement.img_width != None:
+                    #     self.draw.rectangle((imageElement.x_off,imageElement.y_off, imageElement.x_off + imageElement.img_width, imageElement.y_off + imageElement.img_height), outline=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
                     
                 if imageElement.element.element == "title":
                     text = imageElement.data
@@ -177,6 +185,7 @@ class XMLImage:
         rules = self.css_handler.get_css()
 
         self.init_elements(elements, rules)
+                
         self.process(elements, rules)
 
         self.img = Image.alpha_composite(self.img, self.text_layer)
