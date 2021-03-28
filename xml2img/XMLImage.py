@@ -27,52 +27,54 @@ class XMLImage:
 
     def process_css(self, imageElement, rules):
         for id_ in imageElement.element.data.id:
-            if id_ not in rules:
-                continue
-            idents = rules[id_]
-            for ident in idents:
-                value = idents[ident]
-                if type(idents[ident]) == str:
-                    value = self.eval_string(idents[ident])
+            split_ids = id_.split(' ')
+            for n_id in split_ids:
+                if n_id not in rules:
+                    continue
+                idents = rules[n_id]
+                for ident in idents:
+                    value = idents[ident]
+                    if type(idents[ident]) == str:
+                        value = self.eval_string(idents[ident])
 
-                if ident == "display":
-                    if value == "inline":
-                        imageElement.inline = True
-                        imageElement.o_inline = True
-                    elif value == "flex":
-                        imageElement.background = True
-                    else:
-                        imageElement.inline = False
-                        imageElement.o_inline = False
-                elif ident == "margin-left":
-                    imageElement.left_margin += int(value)
-                elif ident == "margin-right":
-                    imageElement.right_margin += int(value)
-                elif ident == "margin-bottom":
-                    imageElement.bottom_margin += int(value)
-                elif ident == "margin-top":
-                    imageElement.top_margin += int(value)
-                elif ident == "margin":
-                    imageElement.left_margin += int(value)
-                    imageElement.top_margin += int(value)
-                    imageElement.bottom_margin += int(value)
-                    imageElement.right_margin += int(value)
-                elif ident == "width":
-                    imageElement.img_width = int(value)
-                elif ident == "height":
-                    imageElement.img_height = int(value)
-                elif ident == "font-family":
-                    imageElement.font_family = value
-                elif ident == "font-size":
-                    imageElement.font_size = int(value)
-                elif ident == "color":
-                    c = value
-                    # handle variable
-                    if type(value) == str:
-                        c = ast.literal_eval(value)
-                    imageElement.color = list(map(int, c))
-                elif ident == "opacity":
-                    imageElement.opacity = value
+                    if ident == "display":
+                        if value == "inline":
+                            imageElement.inline = True
+                            imageElement.o_inline = True
+                        elif value == "flex":
+                            imageElement.background = True
+                        else:
+                            imageElement.inline = False
+                            imageElement.o_inline = False
+                    elif ident == "margin-left":
+                        imageElement.left_margin += int(value)
+                    elif ident == "margin-right":
+                        imageElement.right_margin += int(value)
+                    elif ident == "margin-bottom":
+                        imageElement.bottom_margin += int(value)
+                    elif ident == "margin-top":
+                        imageElement.top_margin += int(value)
+                    elif ident == "margin":
+                        imageElement.left_margin += int(value)
+                        imageElement.top_margin += int(value)
+                        imageElement.bottom_margin += int(value)
+                        imageElement.right_margin += int(value)
+                    elif ident == "width":
+                        imageElement.img_width = int(value)
+                    elif ident == "height":
+                        imageElement.img_height = int(value)
+                    elif ident == "font-family":
+                        imageElement.font_family = value
+                    elif ident == "font-size":
+                        imageElement.font_size = int(value)
+                    elif ident == "color":
+                        c = value
+                        # handle variable
+                        if type(value) == str:
+                            c = ast.literal_eval(value)
+                        imageElement.color = list(map(int, c))
+                    elif ident == "opacity":
+                        imageElement.opacity = value
 
         return imageElement
     
@@ -95,18 +97,14 @@ class XMLImage:
 
             if elements[i].element.element == "RepeatedSection":
                 elements[i].iterable = ast.literal_eval(self.eval_string(elements[i].element.data.iterable[0]))
-                elements[i].element_name = self.eval_string(elements[i].element.data.element_name[0])
-                self.set_variable(elements[i].element_name,elements[i].iterable[0])
-                
+                # elements[i].element_name = self.eval_string(elements[i].element.data.element_name[0])
+                # self.set_variable(elements[i].element_name,elements[i].iterable[0])
                 ne = []
                 for count in range(len(elements[i].iterable)):
-                    new = None
                     new = copy.deepcopy(elements[i].element.children)
-                    print(count)
-                    new = self.init_repeated(new,elements[i].element_name,elements[i].iterable,count)
+                    # new = self.init_repeated(new,elements[i].element_name,elements[i].iterable,count)
                     ne += new
                 elements[i].element.children = ne
-            
             elements[i].init_vars()
             self.init_elements(elements[i].element.children, rules)
     
@@ -116,7 +114,6 @@ class XMLImage:
     def process(self, elements, rules):
 
         for i, imageElement in enumerate(elements):  
-            print(i, imageElement.element.element, imageElement.element.data.id)
                                                 
             imageElement.init_pos(self.draw, self.debug)
             
@@ -137,7 +134,8 @@ class XMLImage:
                                     outline=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))
                 self.draw.text((imageElement.x_off - (imageElement.left_margin - imageElement.right_margin),
                                      imageElement.y_off - (imageElement.top_margin - imageElement.bottom_margin) - 10), f'{imageElement.element.element} {str(i)} {imageElement.element.data.id}', font=font, fill=(255,0,0))
-            if imageElement.element.element != "Section":
+            if imageElement.element.element != "Section" and imageElement.element.element != "RepeatedSection":
+                print(imageElement.data, imageElement.element.element)
                     #if imageElement.element.element != "block":
                     # elif imageElement.img_height != None or imageElement.img_width != None:
                     #     self.draw.rectangle((imageElement.x_off,imageElement.y_off, imageElement.x_off + imageElement.img_width, imageElement.y_off + imageElement.img_height), outline=(random.randint(0,255),random.randint(0,255),random.randint(0,255)))

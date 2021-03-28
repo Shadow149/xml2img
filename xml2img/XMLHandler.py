@@ -13,7 +13,7 @@ class XMLHandler:
         for node in nodes:
             if len(node.xpath("child::*")) == 0:
                 element = node.get().split(' ')[0][1:]
-                css_id = node.xpath("@id").getall()
+                css_id = node.xpath("@id|@class").getall()
                 data = node.xpath("@text|@src").getall()
 
                 n = Element(element, data, css_id, [], parent_element)
@@ -23,7 +23,7 @@ class XMLHandler:
                 else:
                     self.xml_list.append(ie)
             else: 
-                css_id = node.xpath("@id").getall()
+                css_id = node.xpath("@id|@class").getall()
                 iterable = node.xpath("@iterable").getall()
                 element_name = node.xpath("@element").getall()
                 

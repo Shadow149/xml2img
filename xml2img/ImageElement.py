@@ -46,14 +46,12 @@ class ImageElement:
     
     def init_size(self, draw, debug):
         size = self.get_size(draw, debug)
-        print(self.element.element,self.element.data.id,size[1], self.width, self.height)
         if not self.background:
             if (self.width == 0 and self.height == 0):
                 self.width = size[0] + (self.left_margin - self.right_margin)
                 self.height = size[1] + (self.top_margin - self.bottom_margin)
         else:
             self.width, self.height = 0, 0
-        print('first',self.element.element,self.height )
         return self.width, self.height
 
     def get_size(self, draw, debug):
@@ -74,7 +72,6 @@ class ImageElement:
                 else:
                     width = max(widths)
                     height += h
-            print('asdasd',height)
             return width, height
 
         if self.element.element == "title":
@@ -149,7 +146,6 @@ class ImageElement:
         
         
         for i in range(len(self.element.children)):    
-            print('blyat',self.element.element, self.element.data.id)
             self.element.children[i].init_vars()
             self.element.children[i].init_size(draw, debug)
 
@@ -161,7 +157,6 @@ class ImageElement:
                 self.element.children[i].x_off = self.x
                 self.x += self.element.children[i].width
             # self.element.children[i].init_pos(draw, debug)
-        print('---------')    
             # self.x += self.element.children[i].left_margin - self.element.children[i].right_margin 
             # self.y += self.element.children[i].top_margin - self.element.children[i].bottom_margin
         
